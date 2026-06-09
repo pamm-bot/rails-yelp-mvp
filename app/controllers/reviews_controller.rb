@@ -1,12 +1,5 @@
 class ReviewsController < ApplicationController
-  before_action :set_review, only: [ :show, :create, :update, :destroy ]
-
-  def index
-    @reviews = Reviews.all
-  end
-
-  def show
-  end
+  before_action :set_restaurant
 
   def new
     @review = Review.new
@@ -14,32 +7,21 @@ class ReviewsController < ApplicationController
 
   def create
     @review = Review.new(review_params)
+    @review.restaurant = @restaurant
     if @review.save
-      redirect_to @review
+      redirect_to restaurant_path(@restaurant)
     else
-      render :edit, status: :unprocessable_entity
+      render :new, status: :unprocessable_entity
     end
-  end
-
-  def edit
-  end
-
-  def update
-    if @review.update(review_params)
-      redirect_to @review
-    else
-      render :edit, status: :uprocessable_entity
-    end
-  end
-
-  def destroy
-    @review.destroy
-    redirect_to @reviews_path
   end
 
   private
 
-  def set_review
-    @review = Review.find(params[:id])
+  def set_restaurant
+    @restaurant = Restaurant.find(params[:restaurant_id])
+  end
+
+  def review_params
+    params.require(:review).permit(:rating, :content)
   end
 end
